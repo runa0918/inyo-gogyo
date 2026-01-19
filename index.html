@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>陰陽五行占い</title>
+  <meta name="description" content="生年月日から運命数を算出し、十干・陰陽五行の属性を表示します。" />
+  <link rel="stylesheet" href="./style.css" />
+</head>
+<body>
+  <main class="wrap">
+    <header class="header">
+      <h1>陰陽五行占い</h1>
+      <p class="sub">生年月日を入力すると、運命数 → 十干 → 陰陽五行属性を表示します。</p>
+    </header>
+
+    <section class="card">
+      <label class="label" for="birth">生年月日</label>
+      <input id="birth" class="input" type="date" />
+
+      <div class="row">
+        <button id="btnRun" class="btn">占う</button>
+        <button id="btnReset" class="btn secondary" type="button">リセット</button>
+      </div>
+
+      <p class="note">※ 早見表（1940〜2010）に対応。範囲外はエラー表示します。</p>
+
+      <div id="result" class="result" aria-live="polite">
+        <div class="divider"></div>
+
+        <div class="pill" id="birthText">📅 -</div>
+
+        <div class="hero">
+          <div class="hero-title">あなたの属性</div>
+          <div class="hero-value" id="attrText">-</div>
+        </div>
+
+        <div class="grid">
+          <div class="box">
+            <div class="box-title">運命数</div>
+            <div class="box-value" id="unmeiText">-</div>
+          </div>
+          <div class="box">
+            <div class="box-title">十干</div>
+            <div class="box-value" id="jikkanText">-</div>
+          </div>
+        </div>
+
+        <div class="box mt">
+          <div class="box-title">計算の内訳</div>
+          <div class="detail" id="detailText">-</div>
+        </div>
+
+        <div class="box mt">
+          <div class="box-title">性質（サンプル）</div>
+          <div class="detail" id="natureText">-</div>
+        </div>
+      </div>
+    </section>
+
+    <footer class="footer">
+      <small>© Inyo-Gogyo (Static)</small>
+    </footer>
+  </main>
+
+  <script src="./app.js"></script>
+</body>
+</html>
