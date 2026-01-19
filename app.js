@@ -93,7 +93,7 @@ const UNMEI_MAP = {
   0: { jikkan: "癸（みずのと）", attr: "水の陰" },
 };
 
-// ========= 性質（まずはサンプル。後で差し替え可） =========
+// ========= 性質（仮） =========
 const NATURE = {
   "木の陽": "のびのび開拓型。新しい流れを作るのが得意。芯が強く、決めたら速い。",
   "木の陰": "調整と育成が得意。相手に合わせて成長を支える。静かな粘り強さ。",
@@ -107,7 +107,8 @@ const NATURE = {
   "水の陰": "洞察と柔軟性。観察して深く読むタイプ。静かに強い引力を持つ。",
 };
 
-// ========= 計算 =========
+function fmtJP(y,m,d){ return `${y}年${m}月${d}日`; }
+
 function calcInyoGogyo(date) {
   const y = date.getFullYear();
   const m = date.getMonth() + 1; // 1..12
@@ -116,55 +117,134 @@ function calcInyoGogyo(date) {
   const row = HAYAMIHYO[y];
   if (!row) throw new Error(`早見表の対応年ではありません（1940〜2010）: ${y}年`);
 
-  const base = row[m - 1];            // STEP1
-  const sum = base + d;               // STEP2途中
-  const unmei = sum % 10;             // STEP2（1の位）
-  const info = UNMEI_MAP[unmei];      // STEP3
+  const base = row[m - 1];
+  const sum = base + d;
+  const unmei = sum % 10;
+  const info = UNMEI_MAP[unmei];
 
   return {
     y, m, d,
-    base,
-    sum,
-    unmei,
+    base, sum, unmei,
     jikkan: info.jikkan,
     attr: info.attr,
     nature: NATURE[info.attr] || "（性質文 未設定）",
   };
 }
 
-function fmtJP(y,m,d){ return `${y}年${m}月${d}日`; }
-
 // ========= UI =========
 const birth = document.getElementById("birth");
 const btnRun = document.getElementById("btnRun");
 const btnReset = document.getElementById("btnReset");
+const btnShare = document.getElementById("btnShare");
+const btnCopy = document.getElementById("btnCopy");
 const result = document.getElementById("result");
+const note = document.getElementById("note");
 
-btnRun.addEventListener("click", () => {
-  if (!birth.value) return alert("生年月日を入力してね！");
+function setNote(msg, isError=false){
+  note.textContent = msg;
+  note.classList.toggle("error", isError);
+}
+
+function buildShareText(r){
+  return `陰陽五行占い\n${fmtJP(r.y,r.m,r.d)}\n属性：${r.attr}\n十干：${r.jikkan}\n運命数：${r.unmei}\n\n${location.href}`;
+}
+
+function render(r){
+  document.getElementById("birthText").textContent = `📅 ${fmtJP(r.y,r.m,r.d)}`;
+  document.getElementById("attrText").textContent = `${r.attr}`;
+  document.getElementById("heroSub").textContent = `${r.jikkan} / 運命数 ${r.unmei}`;
+  document.getElementById("unmeiText").textContent = `${r.unmei}`;
+  document.getElementById("jikkanText").textContent = `${r.jikkan}`;
+  document.getElementById("natureText").textContent = r.nature;
+  document.getElementById("detailText").textContent =
+    `早見表（年×月）: ${r.base}\n` +
+    `合計（早見表 + 日）: ${r.base} + ${r.d} = ${r.sum}\n` +
+    `運命数（1の位）: ${r.unmei}`;
+
+  result.classList.add("show");
+  result.scrollIntoView({ behavior:"smooth", block:"start" });
+}
+
+function run(){
+  if (!birth.value) {
+    setNote("生年月日を入力してね！", true);
+    alert("生年月日を入力してね！");
+    return;
+  }
 
   const d = new Date(birth.value + "T00:00:00");
   try {
+    setNote("※早見表（1940〜2010）に対応。範囲外はエラーになります。", false);
     const r = calcInyoGogyo(d);
-
-    document.getElementById("birthText").textContent = `📅 ${fmtJP(r.y,r.m,r.d)}`;
-    document.getElementById("attrText").textContent = `${r.attr}`;
-    document.getElementById("unmeiText").textContent = `${r.unmei}`;
-    document.getElementById("jikkanText").textContent = `${r.jikkan}`;
-    document.getElementById("detailText").textContent =
-      `早見表（年×月）: ${r.base}\n` +
-      `合計（早見表 + 日）: ${r.base} + ${r.d} = ${r.sum}\n` +
-      `運命数（1の位）: ${r.unmei}`;
-    document.getElementById("natureText").textContent = r.nature;
-
-    result.classList.add("show");
-    result.scrollIntoView({ behavior:"smooth", block:"start" });
+    render(r);
   } catch (e) {
+    setNote(e.message, true);
     alert(e.message);
+  }
+}
+
+function reset(){
+  result.classList.remove("show");
+  setNote("※早見表（1940〜2010）に対応。範囲外はエラーになります。", false);
+}
+
+btnRun.addEventListener("click", run);
+btnReset.addEventListener("click", () => { reset(); });
+
+birth.addEventListener("keydown", (e) => {
+  if (e.key === "Enter") run();
+});
+
+// 初期値：今日（好みで消してOK）
+(() => {
+  const today = new Date();
+  const yyyy = today.getFullYear();
+  const mm = String(today.getMonth() + 1).padStart(2, "0");
+  const dd = String(today.getDate()).padStart(2, "0");
+  if (!birth.value) birth.value = `${yyyy}-${mm}-${dd}`;
+})();
+
+btnCopy?.addEventListener("click", async () => {
+  if (!result.classList.contains("show")) return alert("先に占ってね！");
+  const d = new Date(birth.value + "T00:00:00");
+  const r = calcInyoGogyo(d);
+  const text = buildShareText(r);
+
+  try{
+    await navigator.clipboard.writeText(text);
+    alert("結果をコピーしました！");
+  }catch{
+    // clipboard不可環境フォールバック
+    prompt("コピーしてね", text);
   }
 });
 
-btnReset.addEventListener("click", () => {
-  birth.value = "";
-  result.classList.remove("show");
+btnShare?.addEventListener("click", async () => {
+  if (!result.classList.contains("show")) return alert("先に占ってね！");
+  const d = new Date(birth.value + "T00:00:00");
+  const r = calcInyoGogyo(d);
+  const text = buildShareText(r);
+
+  if (navigator.share){
+    try{
+      await navigator.share({ title: "陰陽五行占い", text });
+    }catch{
+      // shareキャンセルは無視
+    }
+  }else{
+    // share非対応はコピーへ
+    try{
+      await navigator.clipboard.writeText(text);
+      alert("共有機能が無いので、結果をコピーしました！");
+    }catch{
+      prompt("共有用テキスト", text);
+    }
+  }
 });
+
+// ========= PWA (Service Worker) =========
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("./sw.js").catch(() => {});
+  });
+}
