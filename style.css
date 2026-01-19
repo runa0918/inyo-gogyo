@@ -94,17 +94,11 @@ body{
 }
 
 /* ===== カード ===== */
-.card{
-  border:1px solid var(--line);
-  background:linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.03));
-  border-radius:var(--r);
-  box-shadow:var(--shadow);
-  padding:16px;
-  backdrop-filter: blur(10px);
-  min-width:0;
+.card, .form{
+  max-width: 100%;
+  overflow-x: hidden;
 }
 
-.form{ min-width:0; }
 
 .label{
   display:block;
@@ -113,16 +107,20 @@ body{
   margin:0 0 8px;
 }
 
+/* ===== Chromeでも効く：date入力のはみ出し対策 ===== */
 .input{
-  width:100%;
-  padding:14px 14px;
-  border-radius:14px;
-  border:1px solid var(--line);
-  background: rgba(0,0,0,.25);
-  color: var(--text);
-  font-size:16px; /* iOSズーム防止 */
-  outline:none;
-  min-width:0;
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+
+  box-sizing: border-box;
+
+  /* 中身が幅を押し広げるのを防ぐ */
+  overflow: hidden;
+  white-space: nowrap;
+
+  font-size: 16px; /* iOSズーム抑止にもなる */
 }
 
 .input:focus{
