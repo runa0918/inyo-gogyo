@@ -12,8 +12,11 @@
   --safe-top: env(safe-area-inset-top, 0px);
 }
 
+/* ===== 基本リセット & はみ出し防止 ===== */
 *{ box-sizing:border-box; }
 html,body{ height:100%; }
+html, body{ overflow-x:hidden; } /* 横はみ出し最優先対策 */
+img, svg, video, canvas{ max-width:100%; height:auto; }
 
 body{
   margin:0;
@@ -28,18 +31,28 @@ body{
   justify-content:center;
 }
 
-/* page */
+/* ===== レイアウト ===== */
 .wrap{
   width:min(620px, 92vw);
-  padding: calc(16px + var(--safe-top)) 0 calc(100px + var(--safe-bottom));
+  padding: calc(16px + var(--safe-top)) 0 calc(100px + var(--safe-bottom)); /* 下固定バーの分 */
+  margin: 0 auto;
 }
 
+/* スマホで微調整（余白取りすぎ防止） */
+@media (max-width: 480px){
+  .wrap{
+    width: 94vw;
+  }
+}
+
+/* ===== ヘッダー ===== */
 .header{ margin: 4px 4px 14px; }
 
 .brand{
   display:flex;
   gap:12px;
   align-items:center;
+  min-width: 0;
 }
 
 .logo{
@@ -53,6 +66,11 @@ body{
   border:1px solid rgba(122,162,255,.55);
   background: linear-gradient(180deg, rgba(122,162,255,.22), rgba(122,162,255,.10));
   box-shadow: 0 10px 25px rgba(0,0,0,.25);
+  flex: 0 0 auto;
+}
+
+.brand-text{
+  min-width: 0;
 }
 
 .brand-text h1{
@@ -61,13 +79,16 @@ body{
   font-weight:850;
   letter-spacing:.02em;
 }
+
 .sub{
   margin:0;
   color:var(--muted);
   font-size:13px;
   line-height:1.45;
+  word-break: break-word;
 }
 
+/* ===== カード ===== */
 .card{
   border:1px solid var(--line);
   background:linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.03));
@@ -75,7 +96,10 @@ body{
   box-shadow:var(--shadow);
   padding:16px;
   backdrop-filter: blur(10px);
+  min-width:0;
 }
+
+.form{ min-width:0; }
 
 .label{
   display:block;
@@ -91,8 +115,9 @@ body{
   border:1px solid var(--line);
   background: rgba(0,0,0,.25);
   color: var(--text);
-  font-size:16px; /* iOS zoom防止 */
+  font-size:16px; /* iOSズーム防止 */
   outline:none;
+  min-width:0;
 }
 
 .input:focus{
@@ -105,13 +130,15 @@ body{
   color:var(--muted);
   font-size:12px;
   line-height:1.5;
+  word-break: break-word;
 }
 
 .note.error{
   color: #ffb4b4;
 }
 
-.result{ display:none; margin-top:14px; }
+/* ===== 結果表示 ===== */
+.result{ display:none; margin-top:14px; min-width:0; }
 .result.show{ display:block; }
 
 .divider{ height:1px; background:var(--line); margin:14px 0; }
@@ -126,9 +153,10 @@ body{
   background: rgba(0,0,0,.22);
   color:var(--muted);
   font-size:12px;
+  max-width: 100%;
 }
 
-.hero{ margin-top:10px; }
+.hero{ margin-top:10px; min-width:0; }
 .hero-title{
   color:var(--muted);
   font-size:12px;
@@ -138,24 +166,23 @@ body{
   font-size:22px;
   font-weight:900;
   letter-spacing:.02em;
+  word-break: break-word;
 }
 .hero-sub{
   margin-top:6px;
   color:rgba(255,255,255,.75);
   font-size:13px;
   line-height:1.5;
+  word-break: break-word;
 }
 
+/* グリッドのはみ出し対策：min-width:0 が超大事 */
 .grid{
   display:grid;
   grid-template-columns: 1fr 1fr;
   gap:10px;
   margin-top:12px;
-}
-
-@media (max-width: 420px){
-  .grid{ grid-template-columns: 1fr; }
-  .hero-value{ font-size: 20px; }
+  min-width:0;
 }
 
 .box{
@@ -163,10 +190,19 @@ body{
   background: rgba(0,0,0,.18);
   border-radius:16px;
   padding:14px;
+  min-width:0;
 }
 
-.box-title{ color:var(--muted); font-size:12px; margin-bottom:6px; }
-.box-value{ font-size:15px; font-weight:800; }
+.box-title{
+  color:var(--muted);
+  font-size:12px;
+  margin-bottom:6px;
+}
+.box-value{
+  font-size:15px;
+  font-weight:800;
+  word-break: break-word;
+}
 
 .detail{
   color:var(--text);
@@ -175,13 +211,23 @@ body{
   line-height:1.6;
   white-space:pre-wrap;
   word-break: break-word;
+  overflow-wrap: anywhere; /* 長いURLなどでの横はみ出し防止 */
 }
 
 .mt{ margin-top:10px; }
-.row{ display:flex; gap:10px; }
-.footer{ margin-top:14px; color:rgba(255,255,255,.45); padding:0 4px; }
 
-/* buttons */
+.row{
+  display:flex;
+  gap:10px;
+  min-width:0;
+}
+
+@media (max-width: 420px){
+  .grid{ grid-template-columns: 1fr; }
+  .hero-value{ font-size: 20px; }
+}
+
+/* ===== ボタン ===== */
 .btn{
   min-height:48px;
   padding:13px 14px;
@@ -191,6 +237,7 @@ body{
   cursor:pointer;
   border:1px solid transparent;
   color:var(--text);
+  max-width: 100%;
 }
 
 .btn.primary{
@@ -211,14 +258,17 @@ body{
   background: rgba(0,0,0,.10);
   color: rgba(255,255,255,.85);
   font-weight:750;
+  min-width: 0;
 }
 
-/* sticky bottom action bar */
+/* ===== 下固定アクションバー（はみ出し対策込み） ===== */
 .sticky{
   position:fixed;
   left:0;
   right:0;
   bottom:0;
+  width:100%;
+  box-sizing:border-box;
   padding: 12px 12px calc(12px + var(--safe-bottom));
   background: linear-gradient(180deg, rgba(11,15,25,0), rgba(11,15,25,.85) 25%, rgba(11,15,25,.95));
   backdrop-filter: blur(10px);
@@ -226,7 +276,21 @@ body{
   gap:10px;
   justify-content:center;
   z-index: 999;
+  overflow-x: clip; /* 横にはみ出さない */
 }
+
 .sticky .btn{
   width:min(300px, 46vw);
+  max-width: 100%;
 }
+
+/* ===== フッター ===== */
+.footer{
+  margin-top:14px;
+  color:rgba(255,255,255,.45);
+  padding:0 4px;
+}
+
+/* （デバッグ用）どこがはみ出してるか見たい時だけONにしてすぐOFF
+*{ outline: 1px solid rgba(255,0,0,0.2); }
+*/
