@@ -150,16 +150,24 @@ body{
 
 .pill{
   display:inline-flex;
-  gap:8px;
   align-items:center;
+  gap:8px;
+
+  /* ここが大事 */
+  max-width: 100%;
+  min-width: 0;          /* flex内で縮められるように */
+  overflow: hidden;      /* はみ出しを切る */
+  text-overflow: ellipsis;
+  white-space: nowrap;
+
   padding:8px 10px;
   border-radius:999px;
   border:1px solid var(--line);
   background: rgba(0,0,0,.22);
   color:var(--muted);
   font-size:12px;
-  max-width: 100%;
 }
+
 
 .hero{ margin-top:10px; min-width:0; }
 .hero-title{
