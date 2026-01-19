@@ -34,8 +34,13 @@ body{
 /* ===== レイアウト ===== */
 .wrap{
   width:min(620px, 92vw);
-  padding: calc(16px + var(--safe-top)) 0 calc(100px + var(--safe-bottom)); /* 下固定バーの分 */
+  padding: calc(16px + var(--safe-top)) 0 24px;
   margin: 0 auto;
+}
+
+/* 結果表示時だけ下余白を増やす */
+.result.show{
+  padding-bottom: calc(100px + var(--safe-bottom));
 }
 
 /* スマホで微調整（余白取りすぎ防止） */
